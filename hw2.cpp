@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <climits>
 
 // Function:    mainProgram
 // Purpose:     The main program
@@ -154,7 +155,7 @@ bool mainProgram() {
 
             }
             // Check again positive/negative
-            if ((value >= 0 && isNegative) || (value < 0) &&!isNegative) {
+            if ((value >= 0 && isNegative) || ((value < 0) &&!isNegative) ) {
                 std::cout <<
                 "Number is not same as type you provide. Please try again.\n";
                 isValid = false;
@@ -197,13 +198,14 @@ bool mainProgram() {
 
     } while (!isValid);
 
+    return FLAG_EXIT;
 }
 
 void formatForBits(std::vector<int>* binaryVector, int bits, bool isNegative) {
     const int NEGATIVE = 1;
     const int POSITIVE = 0;
 
-    while (binaryVector->size() < bits) {
+    while ((int)binaryVector->size() < bits) {
 
         if (isNegative)
             binaryVector->push_back(NEGATIVE);
@@ -247,14 +249,14 @@ std::string decimalToBinary(long long value, int bits) {
     if (isNegative) {
         int index = 0;
 
-        while (index < valueHolder->size() && valueHolder->at(index) != 1) {
+        while (index < (int)valueHolder->size() && valueHolder->at(index) != 1) {
             index++;
         }
 
         // If first 1 is found
-        if (index < valueHolder->size()) {
+        if (index < (int)valueHolder->size()) {
 
-            for (int i = index + 1; i < valueHolder->size(); ++i) {
+            for (int i = index + 1; i < (int)valueHolder->size(); ++i) {
                 if (valueHolder->at(i) == 0)
                     valueHolder->at(i) = 1;
                 else
@@ -265,13 +267,13 @@ std::string decimalToBinary(long long value, int bits) {
 
     }
 
-    if (valueHolder->size() < bits)
+    if ((int)valueHolder->size() < bits)
         formatForBits(valueHolder, bits, isNegative);
 
     reverse(valueHolder->begin(), valueHolder->end());
 
     // Output format for easy to read
-    for (int i = 1; i <= valueHolder->size(); ++i) {
+    for (int i = 1; i <= (int)valueHolder->size(); ++i) {
         ss << valueHolder->at(i - 1);
         if (i%4 == 0)
             ss << ' ';
