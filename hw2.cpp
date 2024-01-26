@@ -37,8 +37,8 @@ std::string decimalToBinary(long long, int);
 // Returns:     None
 void formatForBits(std::vector<int>*, int, bool);
 
-const std::string COMMAND_EXIT = "ESC";
-const int DIGITS = 64;
+const std::string COMMAND_EXIT = "ESC";     // overall const command
+const int DIGITS = 64;                      // fixed 64 bits
 
 int main() {
     const std::string COMMAND_START = "START";
@@ -69,10 +69,12 @@ int main() {
 
        }
 
+       // Exit command
        else if (user == COMMAND_EXIT) {
            isValid = true;
        }
 
+       // Invalid
        else {
            std::cout << "Invalid input. Please try again.\n";
            isValid = false;
@@ -268,6 +270,7 @@ std::string decimalToBinary(long long value, int bits) {
 
     reverse(valueHolder->begin(), valueHolder->end());
 
+    // Output format for easy to read
     for (int i = 1; i <= valueHolder->size(); ++i) {
         ss << valueHolder->at(i - 1);
         if (i%4 == 0)
