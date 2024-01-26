@@ -1,15 +1,44 @@
+// AUTHOR: Ai Sun 4194172
+// FILE: hw2.cpp
+// DATE: Jan 25 2023
+// PURPOSE: This program converts decimal numbers to 64bits binary
+// representation.
+// INPUT:   User commands and decimal numbers provided by the user.
+// PROCESS: The program prompts the user to enter a command to start or exit.
+//          If the user starts the program, it converts the entered decimal
+//          numbers to binary and displays the result. The program continues
+//          until the user decides to exit.
+// OUTPUT:  Binary representation of decimal numbers and program status messages
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <sstream>
 
-std::string decimalToBinary(long long, int);
-
-void formatForBits(std::vector<int>*, int, bool);
-
+// Function:    mainProgram
+// Purpose:     The main program
+// handles the conversion of decimal numbers to 64bits binary.
+// Parameters:  None
+// Returns:     true if the user chooses to continue,
+// false if the user chooses to exit.
 bool mainProgram();
 
+// Function:    decimalToBinary
+// Purpose:     Converts a decimal number to its binary representation.
+// Parameters:  The decimal number, and the number of bits.
+// Returns:     Binary representation of the decimal number as a string.
+std::string decimalToBinary(long long, int);
+
+// Function:    formatForBits
+// Purpose:     Adds padding to the binary vector to achieve the desired
+// number of bits.
+// Parameters:  The binary vector, the desired number of bits,
+//              and a flag indicating whether the number is negative.
+// Returns:     None
+void formatForBits(std::vector<int>*, int, bool);
+
 const std::string COMMAND_EXIT = "ESC";
+const int DIGITS = 64;
 
 int main() {
     const std::string COMMAND_START = "START";
@@ -19,11 +48,9 @@ int main() {
     std::string user;
 
    // Program Start Point
-   std::cout << "\n---- HOMEWORK 2 ----" << std::endl;
+   std::cout << "\n\t\t\t\t\t---- HOMEWORK 2 ----" << std::endl;
    std::cout
-   << "** Welcome to using Decimal Number to Binary Converter.         **\n"
-      "** This program converts numbers into:\n"
-      "** 16, 32, 64 bits.\n"
+   << "** Welcome to using Decimal Number to 64 bits Binary Converter.  **\n"
       "\n"
       "**                   Input START to start.                       **\n"
       "**               Input ESC to exit the program.                  **\n";
@@ -62,8 +89,38 @@ bool mainProgram() {
 
     std::string user;
     long value;
-    int bits;
+    bool isNegative;
     bool isValid;
+
+    // Accept user input for unsigned/signed
+    do {
+        std::cout << "Enter 1 to convert negative number.\n"
+        << "Enter 0 to convert positive number and zero: ";
+
+        std::cin >> user;
+
+        if (user == "1") {
+
+            isNegative = true;
+            isValid = true;
+
+        }
+        else if (user == "0") {
+            isValid = true;
+            isNegative = false;
+        }
+
+        else if (user == COMMAND_EXIT)
+            return FLAG_EXIT;
+
+        else {
+
+            std::cout << "Invalid input. Please try again.\n";
+            isValid = false;
+
+        }
+
+    } while (!isValid);
 
     // Accept user input for number
     do {
@@ -85,7 +142,7 @@ bool mainProgram() {
             } catch (std::out_of_range& e) {
 
                 std::cout << "Number is out of range(MAX: 64bits). "
-                        "Please try again.\n";
+                             "Please try again.\n";
                 isValid = false;
 
             } catch (std::exception& e) {
@@ -94,7 +151,12 @@ bool mainProgram() {
                 isValid = false;
 
             }
-
+            // Check again positive/negative
+            if ((value >= 0 && isNegative) || (value < 0) &&!isNegative) {
+                std::cout <<
+                "Number is not same as type you provide. Please try again.\n";
+                isValid = false;
+            }
             // Check if it's out of range
             if (value < LONG_MIN) {
 
@@ -107,79 +169,12 @@ bool mainProgram() {
 
     } while (!isValid);
 
-    // Accept user input for unsigned/signed
-    do {
-        std::cout << "Do you want to do unsigned number?(Y/N): ";
-
-        std::cin >> user;
-
-        if (user == "Y" || user == "y") {
-            // Check number
-            if (value < 0) {
-                std::cout << "Number you input " << value << " is negative.\n";
-                isValid = false;
-            }
-            else
-                isValid = true;
-
-        }
-        else if (user == "N" || user == "n") {
-            isValid = true;
-        }
-
-        else if (user == COMMAND_EXIT)
-            return FLAG_EXIT;
-
-        else {
-
-            std::cout << "Invalid input. Please try again.\n";
-            isValid = false;
-
-        }
-
-    } while (!isValid);
-
-    // Accept user input for digits
-    do {
-        std::cout << "Number size: 64, 32, 16 bits? (Input:64, 32, 16): ";
-
-        std::cin >> user;
-
-        // Check if it's exit
-        if (user == COMMAND_EXIT)
-            return FLAG_EXIT;
-
-        // Check if it's valid
-        try {
-
-            bits = stoi(user);
-
-        } catch (std::exception& e) {
-
-            std::cout << "Invalid input. Please try again.\n";
-
-        }
-
-        if (bits != 32 && bits != 64 && bits != 16) {
-            std::cout << "Invalid input. Please try again.\n";
-            isValid = false;
-        }
-
-        else
-            isValid = true;
-
-    } while (!isValid);
-
     std::cout << "\n------------Finish Convert------------\n";
 
-    try {
-        // Execute convert function
-        std::cout <<
-        value << " convert to decimal in " << bits << " digits is \n";
-        std::cout << decimalToBinary(value, bits);
-    } catch (std::exception& e) {
-        std::cout << "\n------------Out of digits------------\n";
-    }
+    // Execute convert function
+    std::cout <<
+        value << " convert to decimal in " << DIGITS << " digits is \n";
+    std::cout << decimalToBinary(value, DIGITS);
 
     do {
         std::cout << "\nWould you like to convert another number? (Y/N) :";
@@ -270,9 +265,6 @@ std::string decimalToBinary(long long value, int bits) {
 
     if (valueHolder->size() < bits)
         formatForBits(valueHolder, bits, isNegative);
-
-    else if (valueHolder->size() > bits)
-            throw std::exception();
 
     reverse(valueHolder->begin(), valueHolder->end());
 
